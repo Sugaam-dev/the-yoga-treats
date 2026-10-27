@@ -19,7 +19,10 @@ export interface RetreatLocation {
   city: string
   region: string
   country: string
+  state?: string
+  address?: string
   fullAddress?: string
+  airportGuidance?: string
   coordinates?: {
     lat: number
     lng: number
@@ -126,8 +129,47 @@ export interface Guest {
   yogaExperienceLevel: SkillLevel
 }
 
-export type BookingStatus = 'confirmed' | 'pending' | 'cancelled' | 'completed'
-export type PaymentStatus = 'paid' | 'deposit_paid' | 'pending' | 'refunded'
+export type BookingStatus = 'pending' | 'confirmed' | 'checked_in' | 'completed' | 'cancelled' | 'rejected'
+export type PaymentStatus = 'paid' | 'deposit_paid' | 'pending' | 'partially_refunded' | 'refunded'
+
+export interface BookingHistoryEntry {
+  status: BookingStatus
+  timestamp: string
+  note?: string
+  actorRole?: DemoRole
+}
+
+export interface BookingAddon {
+  id: string
+  name: string
+  description: string
+  pricePerUnit: number
+  unit: 'per_guest' | 'per_booking'
+  category: 'wellness' | 'transport' | 'nutrition'
+}
+
+export interface SelectedAddon {
+  addonId: string
+  name: string
+  quantity: number
+  unitPrice: number
+  totalPrice: number
+}
+
+export interface BookingPricingBreakdown {
+  nightsCount: number
+  guestsCount: number
+  packagePricePerPerson: number
+  basePackageTotal: number
+  addonsTotal: number
+  taxRate: number
+  taxAmount: number
+  totalAmount: number
+  depositPercentage: number
+  depositAmount: number
+  remainingBalance: number
+  currency: string
+}
 
 export interface Booking {
   id: string
@@ -138,13 +180,16 @@ export interface Booking {
   retreatLocation: string
   packageId: string
   packageName: string
+  accommodationType?: string
   organizerId: string
   organizerName: string
   guestId: string
   guestName: string
   guestEmail: string
+  guestPhone?: string
   startDate: string
   endDate: string
+  nightsCount?: number
   guestsCount: number
   totalAmount: number
   currency: string
@@ -152,6 +197,93 @@ export interface Booking {
   bookingStatus: BookingStatus
   specialRequests?: string
   createdAt: string
+  selectedAddons?: SelectedAddon[]
+  pricing?: BookingPricingBreakdown
+  transactionReference?: string
+  depositPaidAmount?: number
+  remainingBalance?: number
+  history?: BookingHistoryEntry[]
+  cancellationReason?: string
+  cancelledAt?: string
+  checkedInAt?: string
+  completedAt?: string
+  rejectedAt?: string
+  refundAmount?: number
+  refundReference?: string
+}
+
+export interface Refund {
+  id: string
+  refundReference: string
+  bookingId: string
+  bookingReference: string
+  paymentId: string
+  guestId: string
+  guestName: string
+  retreatTitle: string
+  organizerId: string
+  amount: number
+  currency: string
+  reason: string
+  policyApplied: string
+  percentage: number
+  status: 'completed' | 'pending'
+  processedAt: string
+}
+
+export type OfferStatus = 'pending' | 'accepted' | 'declined' | 'expired'
+
+export interface CustomOffer {
+  id: string
+  offerReference: string
+  inquiryId: string
+  organizerId: string
+  organizerName: string
+  guestId: string
+  guestName: string
+  guestEmail?: string
+  retreatId: string
+  retreatTitle: string
+  retreatImage: string
+  retreatLocation: string
+  packageId: string
+  packageName: string
+  accommodationType?: string
+  startDate: string
+  endDate: string
+  nightsCount: number
+  guestsCount: number
+  selectedAddons: SelectedAddon[]
+  pricing: BookingPricingBreakdown
+  message: string
+  expiresAt: string
+  status: OfferStatus
+  createdAt: string
+  bookingId?: string
+}
+
+export interface CancellationQuote {
+  daysUntilArrival: number
+  refundPercentage: number
+  refundableAmount: number
+  policyRule: string
+  canCancel: boolean
+  rejectionReason?: string
+}
+
+export interface BookingDraft {
+  retreatId: string
+  packageId: string
+  startDate: string
+  endDate: string
+  guestsCount: number
+  selectedAddonIds: string[]
+  guestName: string
+  guestEmail: string
+  guestPhone: string
+  specialRequests: string
+  agreedToTerms: boolean
+  currentStep: number
 }
 
 export type InquiryStatus = 'open' | 'replied' | 'closed'
@@ -175,6 +307,7 @@ export interface Inquiry {
   messageCount: number
   createdAt: string
   updatedAt: string
+  customOfferId?: string
 }
 
 export interface Message {
@@ -187,26 +320,55 @@ export interface Message {
   content: string
   createdAt: string
   read: boolean
+  isAutoReply?: boolean
 }
 
-export type ReviewStatus = 'published' | 'flagged' | 'hidden'
+export type ReviewStatus = 'pending' | 'approved' | 'rejected' | 'published' | 'flagged' | 'hidden'
 
 export interface Review {
   id: string
   retreatId: string
   retreatTitle: string
+  bookingId?: string
   guestId: string
   guestName: string
   guestAvatar: string
   rating: number
+  teacherRating?: number
+  venueRating?: number
   title: string
   comment: string
   date: string
   status: ReviewStatus
+  moderationNote?: string
+  moderatedAt?: string
   organizerResponse?: {
     response: string
     respondedAt: string
   }
+}
+
+export type NotificationType =
+  | 'booking_confirmed'
+  | 'booking_cancelled'
+  | 'booking_checkin'
+  | 'custom_offer'
+  | 'inquiry'
+  | 'review_submitted'
+  | 'review_moderated'
+  | 'listing_moderated'
+  | 'payout'
+
+export interface DemoNotification {
+  id: string
+  recipientRole: DemoRole
+  title: string
+  message: string
+  type: NotificationType
+  timestamp: string
+  read: boolean
+  link?: string
+  actorName?: string
 }
 
 export type PaymentTransactionStatus = 'completed' | 'processing' | 'failed' | 'refunded'

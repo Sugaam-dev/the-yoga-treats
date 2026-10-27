@@ -9,6 +9,7 @@ import {
   ChevronDown,
   Check,
   ExternalLink,
+  Home,
 } from 'lucide-react'
 import { useDemoStore } from '@/store/useDemoStore'
 import type { DemoRole } from '@/types'
@@ -17,7 +18,7 @@ import { Badge } from '@/components/ui/Badge'
 import { cn } from '@/lib/utils'
 
 export function DemoRoleSwitcher() {
-  const { demoRole, setDemoRole, resetDemoData, retreats, bookings } = useDemoStore()
+  const { demoRole, setDemoRole, resetDemoData, retreats, bookings, addToast } = useDemoStore()
   const navigate = useNavigate()
   const location = useLocation()
   const [isOpen, setIsOpen] = useState(false)
@@ -34,9 +35,9 @@ export function DemoRoleSwitcher() {
     {
       id: 'guest',
       title: 'Guest Traveler',
-      subtitle: 'Marketplace discovery & bookings',
+      subtitle: 'Marketplace discovery & simulated booking',
       icon: Compass,
-      defaultPath: '/',
+      defaultPath: '/explore',
       badge: 'Marketplace',
     },
     {
@@ -50,7 +51,7 @@ export function DemoRoleSwitcher() {
     {
       id: 'admin',
       title: 'Team Admin',
-      subtitle: 'Moderation & verification hub',
+      subtitle: 'Moderation, verification & finance hub',
       icon: ShieldCheck,
       defaultPath: '/admin',
       badge: 'Internal Ops',
@@ -63,7 +64,7 @@ export function DemoRoleSwitcher() {
     setDemoRole(role)
     setIsOpen(false)
 
-    // If currently on an incompatible route, navigate to the target portal's home
+    // If currently on an incompatible route, navigate to the target portal's default route
     const isGuestPath = !location.pathname.startsWith('/organizer') && !location.pathname.startsWith('/admin')
     const isOrganizerPath = location.pathname.startsWith('/organizer')
     const isAdminPath = location.pathname.startsWith('/admin')
@@ -83,12 +84,17 @@ export function DemoRoleSwitcher() {
       resetDemoData()
       setIsResetting(false)
       setIsOpen(false)
+      addToast({
+        title: 'Demo Data Restored',
+        description: 'All retreats, bookings, inquiries, and reviews reset to default seed state.',
+        type: 'info',
+      })
     }, 400)
   }
 
   return (
     <div className="relative">
-      <div className="flex items-center gap-1.5 p-1 rounded-lg border border-border/70 bg-card/90 backdrop-blur-md shadow-xs">
+      <div className="flex items-center gap-1.5 p-1 rounded-lg border border-border/70 bg-card/90 backdrop-blur-md shadow-2xs">
         <div className="hidden sm:flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground px-2">
           <SlidersHorizontal className="h-3 w-3 text-accent" />
           <span>Demo Role:</span>
@@ -96,7 +102,7 @@ export function DemoRoleSwitcher() {
 
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center gap-2 px-2.5 py-1.5 rounded-md hover:bg-secondary/70 transition-colors text-xs font-medium text-foreground"
+          className="flex items-center gap-2 px-2.5 py-1.5 rounded-md hover:bg-secondary/70 transition-colors text-xs font-medium text-foreground cursor-pointer"
           aria-expanded={isOpen}
           aria-label="Toggle demo role switcher"
         >
@@ -114,7 +120,7 @@ export function DemoRoleSwitcher() {
           onClick={handleReset}
           disabled={isResetting}
           title="Reset demo data to initial factory state"
-          className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary/70 transition-colors disabled:opacity-50"
+          className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary/70 transition-colors disabled:opacity-50 cursor-pointer"
           aria-label="Reset demo state"
         >
           <RotateCcw className={cn('h-3.5 w-3.5', isResetting && 'animate-spin text-primary')} />
@@ -127,18 +133,18 @@ export function DemoRoleSwitcher() {
             className="fixed inset-0 z-40"
             onClick={() => setIsOpen(false)}
           />
-          <div className="absolute right-0 top-full mt-2 z-50 w-80 rounded-xl border border-border bg-card p-2 shadow-xl ring-1 ring-black/5 animate-in fade-in zoom-in-95">
+          <div className="absolute right-0 top-full mt-2 z-50 w-84 rounded-xl border border-border bg-card p-2.5 shadow-xl ring-1 ring-black/5 animate-in fade-in zoom-in-95">
             <div className="px-3 py-2 border-b border-border/70 mb-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Presenter Role Switcher
                 </span>
-                <span className="text-[10px] text-muted-foreground">
-                  Frontend Mock State
+                <span className="text-[10px] text-muted-foreground bg-secondary px-1.5 py-0.5 rounded">
+                  Prototype State
                 </span>
               </div>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Simulate role-based access control and distinct dashboard workflows.
+                Switch perspective without losing current bookings or edits.
               </p>
             </div>
 
@@ -151,7 +157,7 @@ export function DemoRoleSwitcher() {
                     key={r.id}
                     onClick={() => handleRoleSelect(r.id, r.defaultPath)}
                     className={cn(
-                      'w-full flex items-start gap-3 p-2.5 rounded-lg text-left transition-all',
+                      'w-full flex items-start gap-3 p-2.5 rounded-lg text-left transition-all cursor-pointer',
                       isActive
                         ? 'bg-primary/10 border border-primary/20 text-foreground'
                         : 'hover:bg-secondary/60 text-muted-foreground hover:text-foreground'
@@ -174,7 +180,7 @@ export function DemoRoleSwitcher() {
                           <Check className="h-3.5 w-3.5 text-primary shrink-0" />
                         ) : (
                           <span className="text-[10px] text-muted-foreground flex items-center gap-0.5 opacity-70">
-                            Jump <ExternalLink className="h-2.5 w-2.5" />
+                            Switch <ExternalLink className="h-2.5 w-2.5" />
                           </span>
                         )}
                       </div>
@@ -187,7 +193,22 @@ export function DemoRoleSwitcher() {
               })}
             </div>
 
-            <div className="mt-3 pt-2 border-t border-border/70 flex items-center justify-between px-2 text-[11px] text-muted-foreground">
+            {/* Jump to Public Landing Page */}
+            <div className="mt-2 pt-2 border-t border-border/70">
+              <button
+                onClick={() => {
+                  setIsOpen(false)
+                  navigate('/')
+                }}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-foreground hover:bg-secondary/70 transition-colors cursor-pointer"
+              >
+                <Home className="h-3.5 w-3.5 text-accent" />
+                <span className="flex-1 text-left">Return to Public Landing Page</span>
+                <span className="text-[10px] text-muted-foreground font-mono">/</span>
+              </button>
+            </div>
+
+            <div className="mt-2 pt-2 border-t border-border/70 flex items-center justify-between px-2 text-[11px] text-muted-foreground">
               <span>
                 {retreats.length} retreats &bull; {bookings.length} bookings
               </span>
@@ -195,7 +216,7 @@ export function DemoRoleSwitcher() {
                 variant="ghost"
                 size="sm"
                 onClick={handleReset}
-                className="h-7 text-xs text-muted-foreground hover:text-destructive"
+                className="h-7 text-xs text-muted-foreground hover:text-destructive cursor-pointer"
               >
                 <RotateCcw className="h-3 w-3 mr-1" />
                 Reset Data

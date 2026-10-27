@@ -14,9 +14,10 @@ import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import { PageHeader } from '@/components/ui/PageHeader'
+import { formatINR } from '@/utils/pricing'
 
 export function OrganizerListingsPage() {
-  const { retreats, activeOrganizerId, updateRetreatStatus, addToast } = useDemoStore()
+  const { retreats, activeOrganizerId, updateRetreatStatus } = useDemoStore()
   const [filter, setFilter] = useState<'all' | RetreatStatus>('all')
 
   const orgRetreats = retreats.filter((r) => r.organizerId === activeOrganizerId)
@@ -25,14 +26,6 @@ export function OrganizerListingsPage() {
     if (filter === 'all') return true
     return r.status === filter
   })
-
-  const handleCreateNew = () => {
-    addToast({
-      title: 'New Retreat Draft Initialized',
-      description: 'Retreat creation wizard is queued for Phase 2 implementation.',
-      type: 'info',
-    })
-  }
 
   const handleTogglePublish = (retreatId: string, currentStatus: RetreatStatus) => {
     const nextStatus: RetreatStatus =
@@ -51,10 +44,12 @@ export function OrganizerListingsPage() {
           </Badge>
         }
         actions={
-          <Button onClick={handleCreateNew} size="sm" className="gap-1.5 font-medium">
-            <Plus className="h-4 w-4" />
-            Create Retreat Listing
-          </Button>
+          <Link to="/organizer/listings/new">
+            <Button size="sm" className="gap-1.5 font-medium">
+              <Plus className="h-4 w-4" />
+              Create Retreat Listing
+            </Button>
+          </Link>
         }
       />
 
@@ -121,7 +116,7 @@ export function OrganizerListingsPage() {
                       <Clock className="h-3 w-3 text-primary" />
                       {retreat.durationDays} Days / {retreat.durationNights} Nights
                     </span>
-                    <span>Starting ${retreat.startingPrice} {retreat.currency}</span>
+                    <span>Starting {formatINR(retreat.startingPrice)}</span>
                   </div>
 
                   <p className="text-xs text-muted-foreground line-clamp-1">
@@ -149,6 +144,12 @@ export function OrganizerListingsPage() {
                     </>
                   )}
                 </Button>
+
+                <Link to={`/organizer/listings/${retreat.id}/edit`}>
+                  <Button variant="outline" size="sm" className="text-xs">
+                    Edit
+                  </Button>
+                </Link>
 
                 <Link to={`/retreats/${retreat.id}`}>
                   <Button variant="ghost" size="sm" className="text-xs gap-1">

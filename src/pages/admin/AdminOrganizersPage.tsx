@@ -13,13 +13,22 @@ import { Card } from '@/components/ui/Card'
 import { PageHeader } from '@/components/ui/PageHeader'
 
 export function AdminOrganizersPage() {
-  const { organizers, updateOrganizerVerification } = useDemoStore()
+  const { organizers, updateOrganizerVerification, addToast } = useDemoStore()
   const [filter, setFilter] = useState<'all' | VerificationStatus>('all')
 
   const filteredOrganizers = organizers.filter((org) => {
     if (filter === 'all') return true
     return org.verificationStatus === filter
   })
+
+  const handleUpdateStatus = (orgId: string, orgName: string, status: 'verified' | 'rejected') => {
+    updateOrganizerVerification(orgId, status)
+    addToast({
+      title: status === 'verified' ? 'School Verified' : 'Verification Revoked',
+      description: `${orgName} status updated to ${status}.`,
+      type: status === 'verified' ? 'success' : 'info',
+    })
+  }
 
   return (
     <div className="space-y-6">
@@ -39,7 +48,7 @@ export function AdminOrganizersPage() {
           <button
             key={tab}
             onClick={() => setFilter(tab)}
-            className={`px-3 py-1.5 rounded-lg capitalize font-medium transition-colors ${
+            className={`px-3 py-1.5 rounded-lg capitalize font-medium transition-colors cursor-pointer ${
               filter === tab
                 ? 'bg-primary text-primary-foreground font-semibold'
                 : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
@@ -99,7 +108,7 @@ export function AdminOrganizersPage() {
                   {org.credentials.map((cred, i) => (
                     <span
                       key={i}
-                      className="text-[10px] bg-secondary/80 px-2 py-0.5 rounded text-foreground/80"
+                      className="text-[10px] bg-secondary/80 px-2 py-0.5 rounded text-foreground/80 font-medium"
                     >
                       {cred}
                     </span>
@@ -120,7 +129,7 @@ export function AdminOrganizersPage() {
                   size="sm"
                   variant="outline"
                   className="text-xs text-emerald-700 hover:bg-emerald-50 h-8"
-                  onClick={() => updateOrganizerVerification(org.id, 'verified')}
+                  onClick={() => handleUpdateStatus(org.id, org.name, 'verified')}
                 >
                   <CheckCircle className="h-3.5 w-3.5 mr-1" />
                   Approve Verification
@@ -132,7 +141,7 @@ export function AdminOrganizersPage() {
                   size="sm"
                   variant="ghost"
                   className="text-xs text-rose-700 hover:bg-rose-50 h-8"
-                  onClick={() => updateOrganizerVerification(org.id, 'rejected')}
+                  onClick={() => handleUpdateStatus(org.id, org.name, 'rejected')}
                 >
                   <XCircle className="h-3.5 w-3.5 mr-1" />
                   Revoke Verification

@@ -8,9 +8,11 @@ import {
   ShieldCheck,
   Menu,
   X,
+  Home,
 } from 'lucide-react'
 import { useState } from 'react'
 import { DemoRoleSwitcher } from '@/components/navigation/DemoRoleSwitcher'
+import { NotificationPopover } from '@/components/navigation/NotificationPopover'
 import { Button } from '@/components/ui/Button'
 import { useDemoStore } from '@/store/useDemoStore'
 import { cn } from '@/lib/utils'
@@ -41,15 +43,22 @@ export function GuestLayout() {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground selection:bg-primary/15 selection:text-primary">
       {/* Top micro-bar */}
-      <div className="bg-[#18392d] text-sand-50 text-xs py-1.5 px-4 sm:px-8 border-b border-[#285342]">
+      <div className="bg-[#193b32] text-[#f7f3eb] text-xs py-2 px-4 sm:px-8 border-b border-[#285c4d]/60">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Sparkles className="h-3 w-3 text-accent" />
             <span className="font-medium tracking-wide">
-              Hand-selected yoga sanctuaries & holistic immersions worldwide
+              Hand-selected yoga sanctuaries & holistic immersions worldwide &bull; Interactive Prototype
             </span>
           </div>
           <div className="hidden md:flex items-center gap-4 text-xs text-white/80">
+            <Link
+              to="/"
+              className="hover:text-white transition-colors underline decoration-white/40 underline-offset-4"
+            >
+              Public Landing Page
+            </Link>
+            <span className="opacity-40">&bull;</span>
             <Link
               to="/organizer"
               className="hover:text-white transition-colors underline decoration-white/40 underline-offset-4"
@@ -72,8 +81,8 @@ export function GuestLayout() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
           {/* Brand Logo */}
           <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="h-9 w-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-              <Sparkles className="h-4.5 w-4.5 text-accent group-hover:text-accent-foreground" />
+            <div className="h-9 w-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform duration-200">
+              <Sparkles className="h-4.5 w-4.5 text-accent" />
             </div>
             <div className="flex flex-col">
               <span className="font-serif text-xl font-bold tracking-tight text-primary">
@@ -90,14 +99,16 @@ export function GuestLayout() {
             <Link
               to="/"
               className={cn(
-                'px-3.5 py-2 rounded-lg text-sm font-medium transition-colors',
+                'px-3.5 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5',
                 isActive('/') && location.pathname === '/'
                   ? 'text-primary bg-secondary/80 font-semibold'
                   : 'text-foreground/80 hover:text-foreground hover:bg-secondary/50'
               )}
             >
-              Home
+              <Home className="h-3.5 w-3.5 text-muted-foreground" />
+              <span>Public Landing</span>
             </Link>
+
             {navLinks.map((link) => {
               const active = isActive(link.href)
               return (
@@ -111,7 +122,8 @@ export function GuestLayout() {
                       : 'text-foreground/80 hover:text-foreground hover:bg-secondary/50'
                   )}
                 >
-                  {link.label}
+                  <link.icon className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span>{link.label}</span>
                   {link.badge && (
                     <span className="inline-flex items-center justify-center h-4.5 min-w-4.5 px-1 text-[10px] font-bold rounded-full bg-primary text-primary-foreground">
                       {link.badge}
@@ -124,13 +136,16 @@ export function GuestLayout() {
 
           {/* Right Header Actions */}
           <div className="flex items-center gap-3">
+            {/* Notifications */}
+            <NotificationPopover />
+
             {/* Demo Role Switcher */}
             <DemoRoleSwitcher />
 
             {/* Guest Profile pill */}
             <Link
               to="/account/bookings"
-              className="hidden lg:flex items-center gap-2 p-1.5 pl-2 rounded-full border border-border/80 hover:bg-secondary/60 transition-colors"
+              className="hidden lg:flex items-center gap-2 p-1.5 pl-2.5 rounded-full border border-border/80 hover:bg-secondary/60 transition-colors shadow-2xs"
             >
               <span className="text-xs font-medium text-foreground">{guest.name}</span>
               <img
@@ -143,8 +158,9 @@ export function GuestLayout() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg text-foreground hover:bg-secondary"
+              className="md:hidden p-2 rounded-lg text-foreground hover:bg-secondary cursor-pointer"
               aria-label="Toggle navigation menu"
+              aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -162,7 +178,7 @@ export function GuestLayout() {
                 location.pathname === '/' ? 'bg-secondary font-semibold text-primary' : 'text-foreground'
               )}
             >
-              Home
+              Public Landing Page
             </Link>
             {navLinks.map((link) => (
               <Link
@@ -196,7 +212,7 @@ export function GuestLayout() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-xs text-primary font-medium underline"
               >
-                View Account
+                View Bookings
               </Link>
             </div>
           </div>
@@ -209,7 +225,7 @@ export function GuestLayout() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-[#142820] text-sand-100 py-12 mt-16">
+      <footer className="border-t border-border bg-[#193b32] text-[#f7f3eb] py-12 mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-10">
             <div className="space-y-3 md:col-span-1">
@@ -235,17 +251,17 @@ export function GuestLayout() {
               <ul className="space-y-2 text-xs text-white/70">
                 <li>
                   <Link to="/" className="hover:text-white transition-colors">
-                    Marketplace Home
+                    Public Marketing Landing
                   </Link>
                 </li>
                 <li>
                   <Link to="/explore" className="hover:text-white transition-colors">
-                    Retreat Discovery
+                    Retreat Discovery & Filter
                   </Link>
                 </li>
                 <li>
                   <Link to="/account/bookings" className="hover:text-white transition-colors">
-                    Guest Bookings
+                    Guest Bookings & Receipts
                   </Link>
                 </li>
               </ul>
@@ -276,7 +292,7 @@ export function GuestLayout() {
 
             <div>
               <h4 className="text-xs font-semibold uppercase tracking-wider text-white/90 mb-3">
-                Demo Controls
+                Demo Operations
               </h4>
               <p className="text-xs text-white/60 mb-3 leading-relaxed">
                 Switch perspective anytime via the role selector bar in the header or jump to the operations dashboard.
@@ -292,16 +308,16 @@ export function GuestLayout() {
           </div>
 
           <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-white/50 gap-3">
-            <p>&copy; 2025 The Yoga Treats. Interactive frontend demo.</p>
+            <p>&copy; 2026 The Yoga Treats. Interactive frontend demo &bull; Simulated environment.</p>
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-1">
                 <Globe2 className="h-3.5 w-3.5 text-accent" />
-                Vite + React + Tailwind + Zustand
+                Vite + React 19 + Tailwind + Zustand
               </span>
               <span>&bull;</span>
               <span className="flex items-center gap-1">
                 <Heart className="h-3.5 w-3.5 text-rose-400" />
-                Crafted for wellness seekers
+                Crafted for mindful travel
               </span>
             </div>
           </div>

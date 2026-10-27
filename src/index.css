@@ -2,46 +2,63 @@
 
 @layer base {
   :root {
-    --background: #fbf9f5; /* Warm ivory */
-    --foreground: #1c2b24; /* Deep slate forest */
+    /* Warm Ivory & Natural Wellness Tones */
+    --background: #f7f3eb; /* Warm ivory */
+    --foreground: #242a27; /* Charcoal slate */
 
     --card: #ffffff;
-    --card-foreground: #1c2b24;
+    --card-foreground: #242a27;
 
     --popover: #ffffff;
-    --popover-foreground: #1c2b24;
+    --popover-foreground: #242a27;
 
-    --primary: #1f4e3d; /* Forest green */
-    --primary-foreground: #fbf9f5;
+    --primary: #285c4d; /* Forest green */
+    --primary-foreground: #f7f3eb;
 
-    --secondary: #f3eee6; /* Soft sand */
-    --secondary-foreground: #1f4e3d;
+    --secondary: #eee9df; /* Soft neutral sand */
+    --secondary-foreground: #193b32;
 
-    --muted: #f2eee8;
-    --muted-foreground: #667269;
+    --muted: #ebe5db;
+    --muted-foreground: #5e6b64;
 
-    --accent: #c29037; /* Muted gold */
-    --accent-foreground: #ffffff;
+    --accent: #d6a86c; /* Muted gold */
+    --accent-foreground: #193b32;
 
-    --destructive: #dc2626;
+    --destructive: #c24132;
     --destructive-foreground: #ffffff;
 
-    --border: #e8e2d8;
-    --input: #e8e2d8;
-    --ring: #1f4e3d;
+    --border: #e3ddd1;
+    --input: #e3ddd1;
+    --ring: #285c4d;
 
-    --radius: 0.625rem;
+    --deep-forest: #193b32;
+    --charcoal: #242a27;
+    --warm-ivory: #f7f3eb;
+    --muted-gold: #d6a86c;
+
+    --radius: 0.75rem;
   }
 
   * {
     border-color: var(--border);
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     background-color: var(--background);
     color: var(--foreground);
+    font-family: var(--font-sans);
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: rgba(40, 92, 77, 0.18);
+    color: #193b32;
   }
 }
 
@@ -65,6 +82,11 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+
+  --color-deep-forest: #193b32;
+  --color-charcoal: #242a27;
+  --color-warm-ivory: #f7f3eb;
+  --color-muted-gold: #d6a86c;
 
   --font-serif: "Playfair Display", Georgia, serif;
   --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;

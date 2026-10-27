@@ -14,6 +14,7 @@ import { useDemoStore } from '@/store/useDemoStore'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
+import { formatINR } from '@/utils/pricing'
 
 export function HomePage() {
   const navigate = useNavigate()
@@ -184,7 +185,7 @@ export function HomePage() {
                       Starting from
                     </span>
                     <span className="text-base font-bold text-foreground">
-                      ${retreat.startingPrice.toLocaleString()}
+                      {formatINR(retreat.startingPrice)}
                     </span>
                     <span className="text-xs text-muted-foreground"> / guest</span>
                   </div>

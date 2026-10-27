@@ -11,10 +11,12 @@ import {
   X,
   BadgeCheck,
   MapPin,
-  ArrowLeft,
+  Home,
+  Compass,
 } from 'lucide-react'
 import { useDemoStore } from '@/store/useDemoStore'
 import { DemoRoleSwitcher } from '@/components/navigation/DemoRoleSwitcher'
+import { NotificationPopover } from '@/components/navigation/NotificationPopover'
 import { Badge } from '@/components/ui/Badge'
 import { cn } from '@/lib/utils'
 
@@ -83,7 +85,7 @@ export function OrganizerLayout() {
         {/* Brand / Portal Header */}
         <div className="p-5 border-b border-border/80 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2.5">
-            <div className="h-8 w-8 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
+            <div className="h-8 w-8 rounded-lg bg-primary text-primary-foreground flex items-center justify-center">
               <Sparkles className="h-4 w-4 text-accent" />
             </div>
             <div>
@@ -98,7 +100,7 @@ export function OrganizerLayout() {
 
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden p-1.5 rounded-md hover:bg-secondary text-muted-foreground"
+            className="lg:hidden p-1.5 rounded-md hover:bg-secondary text-muted-foreground cursor-pointer"
             aria-label="Close sidebar"
           >
             <X className="h-5 w-5" />
@@ -177,14 +179,24 @@ export function OrganizerLayout() {
         </div>
 
         {/* Bottom Hub Actions */}
-        <div className="p-4 border-t border-border/80 space-y-2">
+        <div className="p-4 border-t border-border/80 space-y-1.5">
+          <Link
+            to="/"
+            className="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-foreground hover:bg-secondary/70 transition-colors"
+          >
+            <span className="flex items-center gap-2 text-primary font-semibold">
+              <Home className="h-3.5 w-3.5 text-accent" />
+              Public Landing Page
+            </span>
+            <span className="text-[10px] text-muted-foreground font-mono">/</span>
+          </Link>
           <Link
             to="/explore"
             className="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/60 transition-colors"
           >
             <span className="flex items-center gap-2">
-              <ArrowLeft className="h-3.5 w-3.5" />
-              Return to Marketplace
+              <Compass className="h-3.5 w-3.5 text-primary" />
+              Guest Marketplace
             </span>
             <ExternalLink className="h-3 w-3" />
           </Link>
@@ -198,21 +210,27 @@ export function OrganizerLayout() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-lg text-foreground hover:bg-secondary"
+              className="lg:hidden p-2 rounded-lg text-foreground hover:bg-secondary cursor-pointer"
               aria-label="Open sidebar"
             >
               <Menu className="h-5 w-5" />
             </button>
             <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground">
+              <Link to="/" className="hover:text-primary transition-colors flex items-center gap-1">
+                <Home className="h-3 w-3 text-accent" />
+                <span>Public Landing</span>
+              </Link>
+              <span>/</span>
               <span className="font-medium text-primary">Organizer Portal</span>
               <span>/</span>
-              <span className="capitalize">
+              <span className="capitalize text-foreground font-semibold">
                 {location.pathname.split('/')[2] || 'Overview'}
               </span>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
+            <NotificationPopover />
             <DemoRoleSwitcher />
           </div>
         </header>

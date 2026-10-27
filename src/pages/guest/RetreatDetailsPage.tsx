@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   Send,
   Sparkles,
+  Compass,
 } from 'lucide-react'
 import { useDemoStore } from '@/store/useDemoStore'
 import { Button } from '@/components/ui/Button'
@@ -17,20 +18,35 @@ import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { GuestBookingFlowModal } from '@/components/booking/GuestBookingFlowModal'
+import { RetreatLocationModal } from '@/components/discovery/RetreatLocationModal'
+import { formatINR } from '@/utils/pricing'
 
 export function RetreatDetailsPage() {
   const { id } = useParams<{ id: string }>()
-  const { retreats, packages, organizers, reviews, addToast, addInquiryMessage } = useDemoStore()
+  const { retreats, packages, organizers, reviews, createInquiry } = useDemoStore()
 
   const retreat = retreats.find((r) => r.id === id)
   const retreatPackages = packages.filter((p) => p.retreatId === id)
   const organizer = organizers.find((o) => o.id === retreat?.organizerId)
-  const retreatReviews = reviews.filter((r) => r.retreatId === id)
+  const retreatReviews = reviews.filter(
+    (r) => r.retreatId === id && (r.status === 'published' || r.status === 'approved')
+  )
 
-  // Booking modal / enquiry state
+  // Booking modal, location modal & enquiry state
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false)
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false)
+  const [selectedBookingPackageId, setSelectedBookingPackageId] = useState<string>(
+    retreatPackages[0]?.id || ''
+  )
   const [inquirySubject, setInquirySubject] = useState('')
   const [inquiryText, setInquiryText] = useState('')
   const [isSubmittingInquiry, setIsSubmittingInquiry] = useState(false)
+
+  const handleOpenBooking = (packageId?: string) => {
+    if (packageId) setSelectedBookingPackageId(packageId)
+    setIsBookingModalOpen(true)
+  }
 
   if (!retreat) {
     return (
@@ -48,30 +64,20 @@ export function RetreatDetailsPage() {
     )
   }
 
-  const handleDemoBookPackage = (pkgName: string) => {
-    addToast({
-      title: 'Package Selected for Demo Reservation',
-      description: `You have selected ${pkgName}. In Phase 2, this opens the complete checkout flow.`,
-      type: 'success',
-    })
-  }
 
   const handleSendInquiry = (e: React.FormEvent) => {
     e.preventDefault()
     if (!inquiryText.trim()) return
 
     setIsSubmittingInquiry(true)
-    setTimeout(() => {
-      addInquiryMessage('inq-901', inquiryText, 'guest')
-      setInquiryText('')
-      setInquirySubject('')
-      setIsSubmittingInquiry(false)
-      addToast({
-        title: 'Enquiry Transmitted to Host',
-        description: `Your question has been routed directly to ${organizer?.name || 'the retreat team'}.`,
-        type: 'success',
-      })
-    }, 500)
+    createInquiry({
+      retreatId: retreat.id,
+      subject: inquirySubject.trim() || 'General Retreat Inquiry',
+      message: inquiryText.trim(),
+    })
+    setInquiryText('')
+    setInquirySubject('')
+    setIsSubmittingInquiry(false)
   }
 
   return (
@@ -93,13 +99,16 @@ export function RetreatDetailsPage() {
         actions={
           <div className="flex items-center gap-3">
             <span className="text-sm font-bold text-foreground">
-              From ${retreat.startingPrice.toLocaleString()} {retreat.currency}
+              From {formatINR(retreat.startingPrice)}
             </span>
-            <a href="#packages">
-              <Button size="sm" variant="gold" className="font-semibold">
-                View Packages
-              </Button>
-            </a>
+            <Button
+              size="sm"
+              variant="gold"
+              onClick={() => handleOpenBooking(retreatPackages[0]?.id)}
+              className="font-semibold"
+            >
+              Book Sanctuary
+            </Button>
           </div>
         }
       />
@@ -137,6 +146,13 @@ export function RetreatDetailsPage() {
               <span>
                 {retreat.location.city}, {retreat.location.country}
               </span>
+              <button
+                onClick={() => setIsLocationModalOpen(true)}
+                className="ml-1 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-secondary text-primary font-semibold hover:bg-secondary/80 border border-primary/20 text-[11px] transition-colors"
+              >
+                <Compass className="h-3 w-3" />
+                GPS Coordinates
+              </button>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-primary" />
@@ -281,7 +297,7 @@ export function RetreatDetailsPage() {
                   <div className="flex flex-col items-end shrink-0 gap-2 border-t md:border-t-0 pt-3 md:pt-0">
                     <div className="text-right">
                       <span className="text-xl font-bold text-foreground">
-                        ${pkg.pricePerPerson.toLocaleString()}
+                        {formatINR(pkg.pricePerPerson)}
                       </span>
                       <span className="text-xs text-muted-foreground"> / guest</span>
                     </div>
@@ -289,7 +305,7 @@ export function RetreatDetailsPage() {
                     <Button
                       size="sm"
                       variant="gold"
-                      onClick={() => handleDemoBookPackage(pkg.name)}
+                      onClick={() => handleOpenBooking(pkg.id)}
                       className="font-semibold shadow-xs"
                     >
                       Reserve Package
@@ -425,6 +441,19 @@ export function RetreatDetailsPage() {
           </Card>
         </div>
       </div>
+
+      <GuestBookingFlowModal
+        retreat={retreat}
+        initialPackageId={selectedBookingPackageId}
+        isOpen={isBookingModalOpen}
+        onClose={() => setIsBookingModalOpen(false)}
+      />
+
+      <RetreatLocationModal
+        retreat={retreat}
+        isOpen={isLocationModalOpen}
+        onClose={() => setIsLocationModalOpen(false)}
+      />
     </div>
   )
 }
